@@ -166,7 +166,7 @@ describe 'Requests for Account', type: :request do
 
       it 'returns any errors' do
         post account_transfer_path(account.id), headers: { 'Authorization' => "Bearer #{token}" }, params: {
-          recipient_account_id: 30,
+          recipient_account_id: recipient_account.id,
           amount: 600
         }, as: :json
 
