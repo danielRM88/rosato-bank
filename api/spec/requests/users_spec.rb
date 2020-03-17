@@ -40,7 +40,7 @@ describe 'Requests for Users', type: :request do
       let!(:user) { create(:user) }
       let(:token) { JsonWebToken.encode({ user_id: user.id }) }
 
-      it 'returns list of users' do
+      it 'creates the user' do
         post users_path, headers: { 'Authorization' => "Bearer #{token}" }, params: {
           user: {
             user_name: 'Daniel',
@@ -55,6 +55,18 @@ describe 'Requests for Users', type: :request do
         expect(created.user_name).to eq('Daniel')
         expect(created.user_lastname).to eq('Rosato')
         expect(created.email).to eq('new-user@test.com')
+      end
+
+      it 'validates required fields' do
+        post users_path, headers: { 'Authorization' => "Bearer #{token}" }, params: {
+          user: {
+            user_name: 'Daniel',
+            user_lastname: 'Rosato',
+            email: 'new-user@test.com'
+          }
+        }, as: :json
+
+        expect(response.status).to eq(422)
       end
     end
   end
@@ -73,7 +85,7 @@ describe 'Requests for Users', type: :request do
     context 'authenticated' do
       let(:token) { JsonWebToken.encode({ user_id: user.id }) }
 
-      it 'returns list of users' do
+      it 'updates the user' do
         patch user_path(user.id), headers: { 'Authorization' => "Bearer #{token}" }, params: {
           user: {
             user_lastname: 'Monaco'
@@ -103,7 +115,7 @@ describe 'Requests for Users', type: :request do
     context 'authenticated' do
       let(:token) { JsonWebToken.encode({ user_id: user.id }) }
 
-      it 'returns list of users' do
+      it 'deletes the user' do
         delete user_path(user.id), headers: { 'Authorization' => "Bearer #{token}" }
 
         expect(response).to be_no_content
@@ -126,7 +138,7 @@ describe 'Requests for Users', type: :request do
     context 'authenticated' do
       let(:token) { JsonWebToken.encode({ user_id: user.id }) }
 
-      it 'returns list of users' do
+      it 'returns user' do
         get user_path(user.id), headers: { 'Authorization' => "Bearer #{token}" }
 
         json = JSON.parse(response.body)
