@@ -6,7 +6,11 @@ class TransferService
       to.update!(balance: to.balance+balance)
       to.transactions.create!(amount: balance, description: "Transfer from #{from.number}")
     end
+
+    true
   rescue StandardError => ex
     Rails.logger.error(ex.message)
+
+    false
   end
 end

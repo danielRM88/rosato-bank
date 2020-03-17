@@ -134,4 +134,46 @@ describe 'Requests for Account', type: :request do
       end
     end
   end
+
+  describe 'POST /accounts/:id/transfer' do
+    let(:recipient_start_balance) { 230.5 }
+    let(:account_start_balance) { 500 }
+    let(:account) { create(:account, user: user, balance: account_start_balance) }
+    let(:recipient_account) { create(:account, user: user, balance: recipient_start_balance) }
+    let(:amount) { 475.5 }
+
+    context 'not authenticated' do
+      it 'returns 401' do
+        post account_transfer_path(account.id)
+
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context 'authenticated' do
+      it 'transfers amount between accounts' do
+        post account_transfer_path(account.id), headers: { 'Authorization' => "Bearer #{token}" }, params: {
+          recipient_account_id: recipient_account.id,
+          amount: amount
+        }, as: :json
+
+        expect(response).to be_ok
+        recipient_account.reload
+        account.reload
+        expect(account_start_balance - amount).to eq(account.balance)
+        expect(amount + recipient_start_balance).to eq(recipient_account.balance)
+      end
+
+      it 'returns any errors' do
+        post account_transfer_path(account.id), headers: { 'Authorization' => "Bearer #{token}" }, params: {
+          recipient_account_id: 30,
+          amount: 600
+        }, as: :json
+
+        expect(response.status).to eq(422)
+        json = JSON.parse(response.body)
+        expect(json).to match("balance"=>["must be greater than or equal to 0"])
+      end
+    end
+  end
 end
