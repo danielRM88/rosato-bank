@@ -1,5 +1,7 @@
 class TransferService
   def self.transfer(from, to, balance)
+    return false if (from.id == to.id || from.blank? || to.blank?)
+
     ActiveRecord::Base.transaction do
       from.update!(balance: from.balance-balance)
       from.transactions.create!(amount: balance*-1, description: "Transfer to #{to.number}")
