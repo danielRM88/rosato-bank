@@ -4,5 +4,5 @@ build-api:
 start:
 	cd api && docker-compose up
 
-build-and-run: build-api
+run: build-api
 	cd api && docker-compose up
