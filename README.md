@@ -2,7 +2,7 @@
 
 ## Running the Project
 
-In order to run the project, clone the repo and run the following command from the terminal:
+In order to run the project docker needs to be installed, clone the repo and run the following command from the terminal:
 
 `make run`
 
